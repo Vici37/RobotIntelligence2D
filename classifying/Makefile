@@ -1,6 +1,6 @@
 CAFFE_ROOT=/home/tsornson/programming/caffe/caffe
-FLAGS=-O2 -DCPU_ONLY
-LINKS=-lglog -lcaffe -lprotobuf
+FLAGS=-O2 -DCPU_ONLY -g
+LINKS=-lglog -lcaffe -lprotobuf -lopencv_core -lopencv_imgproc -lopencv_highgui
 EXE=classify
 MAIN=caffe_test.cpp
 

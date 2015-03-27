@@ -11,40 +11,42 @@
 #include "caffe/util/io.hpp"
 #include "caffe/blob.hpp"
 
+#include <opencv2/opencv.hpp>
+
 using namespace caffe;
 using namespace std;
 
 int main(int argc, char** argv) {
 
-  if (argc < 4 || argc > 6) {
-    LOG(ERROR) << "test_net net_proto pretrained_net_proto iterations "
-        << "[CPU/GPU] [Device ID]";
-    return 1;
-  }
+  // if (argc < 4 || argc > 6) {
+  //   LOG(ERROR) << "test_net net_proto pretrained_net_proto iterations "
+  //       << "[CPU/GPU] [Device ID]";
+  //   return 1;
+  // }
   //Caffe::set_phase(Caffe::TEST);
 
   //Setting CPU or GPU
-  if (argc >= 5 && strcmp(argv[4], "GPU") == 0) {
-    Caffe::set_mode(Caffe::GPU);
-    int device_id = 0;
-    if (argc == 6) {
-      device_id = atoi(argv[5]);
-    }
-    Caffe::SetDevice(device_id);
-    LOG(ERROR) << "Using GPU #" << device_id;
-  } else {
-    LOG(ERROR) << "Using CPU";
-    Caffe::set_mode(Caffe::CPU);
-  }
+  // if (argc >= 5 && strcmp(argv[4], "GPU") == 0) {
+  //   Caffe::set_mode(Caffe::GPU);
+  //   int device_id = 0;
+  //   if (argc == 6) {
+  //     device_id = atoi(argv[5]);
+  //   }
+  //   Caffe::SetDevice(device_id);
+  //   LOG(ERROR) << "Using GPU #" << device_id;
+  // } else {
+  //   LOG(ERROR) << "Using CPU";
+  //   Caffe::set_mode(Caffe::CPU);
+  // }
 
   //get the net
-  Net<float> caffe_test_net(argv[1], caffe::TEST);
+  Net<float> caffe_test_net("test.prototxt", caffe::TEST);
   //get trained net
-  caffe_test_net.CopyTrainedLayersFrom(argv[2]);
+  caffe_test_net.CopyTrainedLayersFrom("trained_model.caffemodel");
 
   //get datum
   Datum datum;
-  if (!ReadImageToDatum("./cat.png", 1, 227, 227, &datum)) {
+  if (!ReadImageToDatum("./test.jpg", 1, 227, 227, &datum)) {
     LOG(ERROR) << "Error during file reading";
   }
 
@@ -74,8 +76,9 @@ int main(int argc, char** argv) {
   blob->FromProto(blob_proto);
 
   //fill the vector
-  vector<Blob<float>*> bottom;
-  bottom.push_back(blob);
+  vector<Blob<float>*> bottom(1, blob);
+  cout << bottom[0]->num_axes() << endl;
+  // bottom.push_back(blob);
   float type = 0.0;
 
   const vector<Blob<float>*>& result =  caffe_test_net.Forward(bottom, &type);
